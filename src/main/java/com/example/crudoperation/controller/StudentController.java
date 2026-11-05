@@ -1,7 +1,9 @@
 package com.example.crudoperation.controller;
 
 
-import com.example.crudoperation.model.Student;
+import com.example.crudoperation.dto.StudentRequestDTO;
+import com.example.crudoperation.dto.StudentResponseDTO;
+// import com.example.crudoperation.model.Student;
 import com.example.crudoperation.service.StudentService;
 
 import org.springframework.http.HttpStatus;
@@ -23,28 +25,28 @@ public class StudentController {
 
 
     @PostMapping("/create")
-  public ResponseEntity<Student> createStudent(@RequestBody Student student) {
-        Student saved = studentService.saveStudent(student);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+  public ResponseEntity<StudentResponseDTO> createStudent(@RequestBody StudentRequestDTO request) {
+       
+        return new ResponseEntity<>(studentService.saveStudent(request), HttpStatus.CREATED);
     }
 
 
     @GetMapping("/read/{id}")
-   public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
+   public ResponseEntity<StudentResponseDTO> getStudentById(@PathVariable Long id) {
         return ResponseEntity.ok(studentService.getStudentById(id));
     }
 @GetMapping("/readAll")
-public ResponseEntity<List<Student>> getAllStudents() {
+public ResponseEntity<List<StudentResponseDTO>> getAllStudents() {
     return ResponseEntity.ok(studentService.getAllStudents());
 }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Long id,
-                                                 @RequestBody Student student) {
-        return ResponseEntity.ok(studentService.updateStudent(id, student));
+    public ResponseEntity<StudentResponseDTO> updateStudent(@PathVariable Long id,
+                                                 @RequestBody StudentRequestDTO request) {
+        return ResponseEntity.ok(studentService.updateStudent(id, request));
     }
 
-    // DELETE -> DELETE http://localhost:8080/students/1
+    
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteStudent(@PathVariable Long id) {
         studentService.deleteStudent(id);

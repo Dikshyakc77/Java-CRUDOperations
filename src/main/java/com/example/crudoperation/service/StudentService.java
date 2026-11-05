@@ -1,5 +1,7 @@
 package com.example.crudoperation.service;
 
+import com.example.crudoperation.dto.StudentRequestDTO;
+import com.example.crudoperation.dto.StudentResponseDTO;
 import com.example.crudoperation.model.Student;
 import com.example.crudoperation.repository.StudentRepository;
 
@@ -18,37 +20,48 @@ public class StudentService {
     }
 
 
-    public Student saveStudent(Student student) {
-        return studentRepository.save(student);
+    public StudentResponseDTO saveStudent(StudentRequestDTO request) {
+        Student student = new Student(request.name(), request.email(), request.address());
+        return toResponse(studentRepository.save(student));
     }
 
-
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public List<StudentResponseDTO> getAllStudents() {
+        return studentRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-
-    public Student getStudentById(Long id) {
-        return studentRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Student not found with ID: " + id));
+    public StudentResponseDTO getStudentById(Long id) {
+        return toResponse(findStudent(id));
     }
 
+    public StudentResponseDTO updateStudent(Long id, StudentRequestDTO request) {
+        Student existing = findStudent(id);
 
-    public Student updateStudent(Long id, Student student) {
+        existing.setName(request.name());
+        existing.setEmail(request.email());
+        existing.setAddress(request.address());
 
-        Student existingStudent = getStudentById(id);
-
-        existingStudent.setName(student.getName());
-        existingStudent.setEmail(student.getEmail());
-        existingStudent.setAddress(student.getAddress());
-
-        return studentRepository.save(existingStudent);
+        return toResponse(studentRepository.save(existing));
     }
-
 
     public void deleteStudent(Long id) {
-        getStudentById(id);
+        findStudent(id);
         studentRepository.deleteById(id);
+    }
+
+    private Student findStudent(Long id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with ID: " + id));
+    }
+
+    private StudentResponseDTO toResponse(Student student) {
+        return new StudentResponseDTO(
+                student.getId(),
+                student.getName(),
+                student.getEmail(),
+                student.getAddress()
+        );
     }
 }
